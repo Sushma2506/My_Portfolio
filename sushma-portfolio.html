@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sushma's Portfolio</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0a0a0b;--bg2:#111113;--bg3:#18181b;--surface:#1e1e22;
+    --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+    --text:#e8e8e6;--text2:#9b9b96;--text3:#64645e;
+    --accent:#c8b99a;--accent2:#8fa8c4;--accent3:#9ab89a;
+  }
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:1.7;overflow-x:hidden}
+  #bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.5}
+  .wrap{position:relative;z-index:1}
+  .container{max-width:1100px;margin:0 auto;padding:0 32px}
+  nav{position:fixed;top:0;width:100%;z-index:100;backdrop-filter:blur(20px);background:rgba(10,10,11,0.75);border-bottom:1px solid var(--border)}
+  .nav-inner{max-width:1100px;margin:0 auto;padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between}
+  .logo{font-size:14px;font-weight:500;letter-spacing:.12em;color:var(--accent);text-transform:uppercase}
+  .nav-links{display:flex;gap:32px;list-style:none}
+  .nav-links a{color:var(--text2);font-size:13px;letter-spacing:.06em;text-decoration:none;transition:color .2s;text-transform:uppercase}
+  .nav-links a:hover{color:var(--text)}
+  .hero{min-height:100vh;display:flex;align-items:center;padding:120px 0 80px}
+  .hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+  .hero-title{font-size:clamp(36px,4vw,54px);font-weight:400;line-height:1.1;letter-spacing:-.02em;margin-bottom:12px}
+  .hero-title span{color:var(--accent);font-style:italic}
+  .hero-subtitle{font-size:15px;color:var(--text2);line-height:1.75;margin-bottom:36px;max-width:480px}
+  .hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:40px}
+  .tag{font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:6px 14px;border:1px solid var(--border2);border-radius:100px;color:var(--text2);background:rgba(255,255,255,0.02)}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 26px;border-radius:8px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .25s;border:none;text-decoration:none}
+  .btn-primary{background:var(--accent);color:#0a0a0b;font-weight:500}
+  .btn-primary:hover{opacity:.88;transform:translateY(-1px)}
+  .btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2)}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+  .hero-card-wrap{perspective:900px}
+  .hero-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;transform-style:preserve-3d;transition:transform .12s ease-out;position:relative;overflow:hidden}
+  .hero-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 60% 20%,rgba(200,185,154,.06),transparent 70%);pointer-events:none}
+  .card-label{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3);margin-bottom:20px}
+  .card-stat{display:flex;align-items:baseline;gap:6px;margin-bottom:8px}
+  .card-num{font-size:42px;font-weight:300;letter-spacing:-.03em;color:var(--text);line-height:1}
+  .card-unit{font-size:13px;color:var(--text2)}
+  .card-desc{font-size:12px;color:var(--text3);margin-bottom:28px}
+  .card-divider{height:1px;background:var(--border);margin:20px 0}
+  .card-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .card-tool{font-size:12px;color:var(--text2)}
+  .card-dot{width:6px;height:6px;border-radius:50%}
+  .dot-green{background:var(--accent3)}.dot-blue{background:var(--accent2)}.dot-gold{background:var(--accent)}
+  section{padding:100px 0}
+  .section-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:40px;display:flex;align-items:center;gap:12px}
+  .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+  .section-title{font-size:clamp(28px,3vw,40px);font-weight:400;letter-spacing:-.02em;margin-bottom:16px;line-height:1.15}
+  .section-sub{font-size:15px;color:var(--text2);max-width:560px;line-height:1.75}
+  .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:60px;align-items:start}
+  .about-text p{color:var(--text2);line-height:1.8;margin-bottom:16px;font-size:15px}
+  .about-text p strong{color:var(--text)}
+  .about-values{display:grid;gap:14px}
+  .value-item{padding:20px 24px;background:var(--surface);border:1px solid var(--border);border-radius:12px;transition:border-color .2s,transform .2s}
+  .value-item:hover{border-color:var(--border2);transform:translateX(4px)}
+  .value-title{font-size:13px;font-weight:500;margin-bottom:4px}
+  .value-desc{font-size:12px;color:var(--text3);line-height:1.6}
+  .skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:60px}
+  .skill-block{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;transition:border-color .25s,transform .25s}
+  .skill-block:hover{border-color:var(--border2);transform:translateY(-3px)}
+  .skill-block-header{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+  .skill-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  .icon-gold{background:rgba(200,185,154,.12)}.icon-blue{background:rgba(143,168,196,.12)}
+  .skill-block-title{font-size:14px;font-weight:500}
+  .skill-block-sub{font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase}
+  .pill-grid{display:flex;flex-wrap:wrap;gap:7px}
+  .pill{font-size:11px;padding:5px 12px;border-radius:100px;border:1px solid var(--border);color:var(--text2);background:rgba(255,255,255,.02);transition:all .2s}
+  .pill:hover{border-color:var(--accent);color:var(--accent)}
+  .pill-highlight{border-color:rgba(200,185,154,.3);color:var(--accent);background:rgba(200,185,154,.05)}
+  .pill-cert{border-color:rgba(154,184,154,.3);color:var(--accent3);background:rgba(154,184,154,.05)}
+  .projects-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:60px}
+  .project-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;transition:all .25s;cursor:pointer;position:relative;overflow:hidden}
+  .project-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(200,185,154,.05),transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
+  .project-card:hover{border-color:var(--border2);transform:translateY(-4px)}
+  .project-card:hover::after{opacity:1}
+  .project-num{font-size:11px;color:var(--text3);letter-spacing:.12em;margin-bottom:20px;font-weight:500}
+  .project-title{font-size:17px;font-weight:400;margin-bottom:10px;line-height:1.35}
+  .project-desc{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:20px}
+  .project-pills{display:flex;flex-wrap:wrap;gap:6px}
+  .project-pill{font-size:10px;padding:4px 10px;border-radius:100px;letter-spacing:.06em;text-transform:uppercase}
+  .pp-iam{background:rgba(200,185,154,.08);color:var(--accent);border:1px solid rgba(200,185,154,.2)}
+  .pp-ai{background:rgba(143,168,196,.08);color:var(--accent2);border:1px solid rgba(143,168,196,.2)}
+  .pp-sec{background:rgba(154,184,154,.08);color:var(--accent3);border:1px solid rgba(154,184,154,.2)}
+  .project-arrow{position:absolute;top:24px;right:24px;width:28px;height:28px;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);transition:all .2s}
+  .project-card:hover .project-arrow{border-color:var(--accent);color:var(--accent)}
+  .exp-skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:60px}
+  .exp-skill-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;transition:border-color .25s,transform .25s}
+  .exp-skill-card:hover{border-color:var(--border2);transform:translateY(-3px)}
+  .exp-skill-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .exp-skill-icon{font-size:18px;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .esi-gold{background:rgba(200,185,154,.1)}.esi-blue{background:rgba(143,168,196,.1)}.esi-green{background:rgba(154,184,154,.1)}
+  .exp-skill-name{font-size:15px;font-weight:500;color:var(--text)}
+  .exp-skill-sub{font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+  .exp-skill-desc{font-size:13px;color:var(--text2);line-height:1.75;margin-bottom:16px}
+  .exp-skill-highlights{display:grid;gap:8px;margin-bottom:16px}
+  .exp-highlight{font-size:12px;color:var(--text2);padding-left:14px;position:relative;line-height:1.6}
+  .exp-highlight::before{content:'—';position:absolute;left:0;color:var(--text3);font-size:11px}
+  .exp-where{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+  .exp-where-tag{font-size:10px;padding:3px 9px;border-radius:4px;background:var(--bg3);color:var(--text3);letter-spacing:.06em;text-transform:uppercase}
+  .contact-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px;max-width:520px;margin-top:60px}
+  .contact-heading{font-size:20px;font-weight:400;margin-bottom:10px}
+  .contact-sub{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:28px}
+  .contact-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}
+  .contact-row:last-child{border-bottom:none}
+  .contact-icon{width:32px;height:32px;border-radius:8px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+  .contact-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em}
+  .contact-val{font-size:13px;color:var(--text2)}
+  footer{padding:40px 0;border-top:1px solid var(--border)}
+  .footer-inner{display:flex;align-items:center;justify-content:space-between}
+  .footer-copy{font-size:12px;color:var(--text3);letter-spacing:.06em}
+  .footer-links{display:flex;gap:24px}
+  .footer-links a{font-size:12px;color:var(--text3);text-decoration:none;transition:color .2s;letter-spacing:.06em;text-transform:uppercase}
+  .footer-links a:hover{color:var(--text2)}
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .65s ease,transform .65s ease}
+  .reveal.visible{opacity:1;transform:none}
+  .reveal-delay-1{transition-delay:.1s}.reveal-delay-2{transition-delay:.2s}.reveal-delay-3{transition-delay:.3s}
+  @media(max-width:900px){.hero-inner,.about-grid,.skills-grid,.exp-skills-grid{grid-template-columns:1fr}.projects-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:600px){.projects-grid{grid-template-columns:1fr}.container{padding:0 20px}.nav-links{display:none}}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="wrap">
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">Sushma's Portfolio</div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Work</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div>
+        <h1 class="hero-title">IAM Expert &amp;<br><span>AI Engineer</span></h1>
+        <p class="hero-subtitle">Building secure identity ecosystems and intelligent AI systems. Bridging the gap between enterprise security and next-generation AI.</p>
+        <div class="hero-tags">
+          <span class="tag">CyberArk</span><span class="tag">Okta</span><span class="tag">SailPoint</span>
+          <span class="tag">Saviynt</span><span class="tag">RAG Systems</span><span class="tag">MCP</span><span class="tag">AI Agents</span>
+        </div>
+        <div class="hero-cta">
+          <a href="#contact" class="btn btn-primary">Get in touch →</a>
+          <a href="#projects" class="btn btn-ghost">View work</a>
+        </div>
+      </div>
+      <div class="hero-card-wrap" id="tilt-card">
+        <div class="hero-card" id="the-card">
+          <div class="card-label">Expertise snapshot</div>
+          <div class="card-stat"><span class="card-num">6</span><span class="card-unit">yrs</span></div>
+          <div class="card-desc">IAM &amp; identity security experience</div>
+          <div class="card-divider"></div>
+          <div class="card-row"><span class="card-tool">CyberArk PAM</span><span class="card-dot dot-green"></span></div>
+          <div class="card-row"><span class="card-tool">Okta</span><span class="card-dot dot-green"></span></div>
+          <div class="card-row"><span class="card-tool">Oracle OIM</span><span class="card-dot dot-blue"></span></div>
+          <div class="card-row"><span class="card-tool">Saviynt</span><span class="card-dot dot-blue"></span></div>
+          <div class="card-row"><span class="card-tool">SailPoint IIQ</span><span class="card-dot dot-green"></span></div>
+          <div class="card-divider"></div>
+          <div class="card-row"><span class="card-tool">RAG Systems</span><span class="card-dot dot-gold"></span></div>
+          <div class="card-row"><span class="card-tool">MCP Tooling</span><span class="card-dot dot-gold"></span></div>
+          <div class="card-row" style="margin-bottom:0"><span class="card-tool">AI Agents</span><span class="card-dot dot-gold"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="container">
+    <div class="section-label reveal">About</div>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>I'm an <strong>IAM Engineer</strong> with 6 years of experience in enterprise identity security - with a growing interest in building AI systems that make security work smarter.</p>
+        <p>Over the years I've worked hands-on with <strong>CyberArk, Okta, SailPoint, Saviynt</strong> and <strong>Oracle OIM</strong> - building identity systems that are secure, clean and built to last.</p>
+        <p>Recently I've been spending a lot of time on the AI side - building RAG systems, MCP tools and agents - because I think that's where things are heading and I want to be ahead of it.</p>
+      </div>
+      <div class="about-values reveal reveal-delay-1">
+        <div class="value-item"><div class="value-title">Identity Security</div><div class="value-desc">Deep expertise in Privileged Access Management, identity governance, and zero-trust architecture.</div></div>
+        <div class="value-item"><div class="value-title">AI Engineering</div><div class="value-desc">Building RAG pipelines, MCP tooling, and autonomous AI agents that solve real problems.</div></div>
+        <div class="value-item"><div class="value-title">Systems Thinking</div><div class="value-desc">Connecting security posture, compliance requirements, and intelligent automation into coherent systems.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="container">
+    <div class="section-label reveal">Skills &amp; Tools</div>
+    <h2 class="section-title reveal">What I work with</h2>
+    <div class="skills-grid">
+      <div class="skill-block reveal">
+        <div class="skill-block-header"><div class="skill-icon icon-gold">🔐</div><div><div class="skill-block-title">IAM Platforms</div><div class="skill-block-sub">Identity &amp; Access Management</div></div></div>
+        <div class="pill-grid">
+          <span class="pill pill-highlight">SailPoint IIQ</span><span class="pill pill-highlight">CyberArk</span>
+          <span class="pill pill-highlight">Okta</span><span class="pill pill-highlight">Saviynt</span>
+          <span class="pill">Oracle OIM</span><span class="pill">PAM</span><span class="pill">SSO / SAML</span>
+          <span class="pill">RBAC / ABAC</span><span class="pill">Zero Trust</span><span class="pill">IGA</span>
+        </div>
+      </div>
+      <div class="skill-block reveal reveal-delay-1">
+        <div class="skill-block-header"><div class="skill-icon icon-blue">🤖</div><div><div class="skill-block-title">AI Engineering</div><div class="skill-block-sub">Intelligent Systems</div></div></div>
+        <div class="pill-grid">
+          <span class="pill pill-highlight">RAG Systems</span><span class="pill pill-highlight">MCP</span>
+          <span class="pill pill-highlight">AI Agents</span><span class="pill pill-highlight">Ollama</span>
+          <span class="pill">LangChain</span><span class="pill">LlamaIndex</span>
+          <span class="pill">Embeddings</span><span class="pill">ChromaDB</span>
+          <span class="pill">Pinecone</span><span class="pill">Prompt Engineering</span>
+        </div>
+      </div>
+      <div class="skill-block reveal reveal-delay-2">
+        <div class="skill-block-header"><div class="skill-icon icon-gold">⚙️</div><div><div class="skill-block-title">Development</div><div class="skill-block-sub">Languages, Frameworks &amp; Databases</div></div></div>
+        <div class="pill-grid">
+          <span class="pill pill-highlight">Python</span><span class="pill">JavaScript</span>
+          <span class="pill">Shell / Bash</span><span class="pill">PowerShell</span>
+          <span class="pill">FastAPI</span><span class="pill">REST APIs</span>
+          <span class="pill">LangChain</span><span class="pill">MySQL</span>
+          <span class="pill">SQL</span><span class="pill">ChromaDB</span>
+          <span class="pill">Pinecone</span><span class="pill">AWS</span>
+          <span class="pill">Azure</span><span class="pill">GCP</span>
+        </div>
+      </div>
+      <div class="skill-block reveal reveal-delay-3">
+        <div class="skill-block-header"><div class="skill-icon icon-blue">📋</div><div><div class="skill-block-title">Compliance &amp; Security</div><div class="skill-block-sub">Certifications, Governance &amp; SIEM</div></div></div>
+        <div class="pill-grid">
+          <span class="pill pill-cert">CyberArk PAM Defender</span>
+          <span class="pill">SOX</span><span class="pill">HIPAA</span><span class="pill">GDPR</span>
+          <span class="pill">Access Reviews</span><span class="pill">SoD Analysis</span>
+          <span class="pill pill-highlight">Splunk</span><span class="pill pill-highlight">Grafana</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="container">
+    <div class="section-label reveal">Work</div>
+    <h2 class="section-title reveal">Selected projects</h2>
+    <p class="section-sub reveal">Key deliverables spanning enterprise IAM implementations and AI engineering.</p>
+    <div class="projects-grid">
+      <div class="project-card reveal"><div class="project-arrow">↗</div><div class="project-num">01</div><div class="project-title">Local RAG System</div><div class="project-desc">Built a RAG system that reads files of all types - PDF, DOCX, TXT, CSV and more - and lets you ask questions on top of them. Everything runs locally using Ollama - no data goes to the cloud. Built with LangChain and LlamaIndex, stores embeddings in ChromaDB and Pinecone.</div><div class="project-pills"><span class="project-pill pp-ai">RAG</span><span class="project-pill pp-ai">Ollama</span><span class="project-pill pp-ai">LangChain</span><span class="project-pill pp-ai">LlamaIndex</span><span class="project-pill pp-ai">ChromaDB</span></div></div>
+      <div class="project-card reveal reveal-delay-1"><div class="project-arrow">↗</div><div class="project-num">02</div><div class="project-title">MCP Tools</div><div class="project-desc">Created custom MCP tools that give AI models real capabilities - turning them from just answering questions to actually doing things. Built to plug into existing LLM workflows and extend what the model can interact with.</div><div class="project-pills"><span class="project-pill pp-ai">MCP</span><span class="project-pill pp-ai">Tool Use</span><span class="project-pill pp-ai">Python</span><span class="project-pill pp-ai">LLM</span></div></div>
+      <div class="project-card reveal reveal-delay-2"><div class="project-arrow">↗</div><div class="project-num">03</div><div class="project-title">File Management AI Agent</div><div class="project-desc">Built an AI agent that manages files on your local system - create files, add content, organise and manage them through simple instructions. No cloud - everything runs on your machine using Ollama as the local LLM.</div><div class="project-pills"><span class="project-pill pp-ai">AI Agent</span><span class="project-pill pp-ai">Ollama</span><span class="project-pill pp-ai">Python</span><span class="project-pill pp-ai">Local LLM</span></div></div>
+      <div class="project-card reveal"><div class="project-arrow">↗</div><div class="project-num">04</div><div class="project-title">CyberArk PAM - Honda</div><div class="project-desc">Full PAM setup for 500+ privileged accounts across Windows, UNIX and database targets - including JIT access for DevOps, PSM session recording for SOX, and CyberArk Conjur across 30+ microservices to get rid of hardcoded credentials in pipelines.</div><div class="project-pills"><span class="project-pill pp-iam">CyberArk</span><span class="project-pill pp-iam">PAM</span><span class="project-pill pp-sec">SOX</span><span class="project-pill pp-sec">Conjur</span></div></div>
+      <div class="project-card reveal reveal-delay-1"><div class="project-arrow">↗</div><div class="project-num">05</div><div class="project-title">IGA &amp; SSO - The Home Depot</div><div class="project-desc">End-to-end Saviynt IGA rollout - access certifications across 3 audit cycles with no escalations. Okta Conditional Access for 80,000+ users with device trust and risk signals, plus SCIM provisioning to 25+ SaaS apps and SSO for 30+ enterprise apps.</div><div class="project-pills"><span class="project-pill pp-iam">Saviynt</span><span class="project-pill pp-iam">Okta</span><span class="project-pill pp-iam">SCIM</span><span class="project-pill pp-sec">IGA</span></div></div>
+      <div class="project-card reveal reveal-delay-2"><div class="project-arrow">↗</div><div class="project-num">06</div><div class="project-title">SailPoint IGA - Citi Group</div><div class="project-desc">Designed birthright access for 30,000+ users, ran SoD analysis that found 200+ toxic access combinations, and connected SailPoint to Azure AD and AWS IAM to bring 40,000+ cloud identities under one governance model - SOX and GDPR compliant throughout.</div><div class="project-pills"><span class="project-pill pp-iam">SailPoint</span><span class="project-pill pp-iam">IGA</span><span class="project-pill pp-sec">SOX</span><span class="project-pill pp-sec">GDPR</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="container">
+    <div class="section-label reveal">Experience</div>
+    <h2 class="section-title reveal">What I've done</h2>
+    <p class="section-sub reveal">6 years across Honda, The Home Depot, Citi Group and CTE Global - grouped by what I actually worked on.</p>
+    <div class="exp-skills-grid">
+      <div class="exp-skill-card reveal">
+        <div class="exp-skill-header"><div class="exp-skill-icon esi-gold">🔒</div><div><div class="exp-skill-name">Privileged Access Management</div><div class="exp-skill-sub">CyberArk · Conjur · JIT</div></div></div>
+        <div class="exp-skill-desc">Set up and managed PAM environments covering 500+ accounts across Windows, UNIX and database targets. Moved teams off standing privileges to Just-In-Time access, automated password rotation on 300+ accounts, and extended coverage to Kubernetes workloads and microservices using CyberArk Conjur.</div>
+        <div class="exp-skill-highlights">
+          <div class="exp-highlight">JIT access for DevOps - no more standing privileges</div>
+          <div class="exp-highlight">Conjur across 30+ microservices - removed hardcoded credentials</div>
+          <div class="exp-highlight">PSM session recording for SOX audit compliance</div>
+          <div class="exp-highlight">PowerShell + REST API bulk onboarding across 200+ servers</div>
+        </div>
+        <div class="exp-where"><span class="exp-where-tag">Honda</span></div>
+      </div>
+      <div class="exp-skill-card reveal reveal-delay-1">
+        <div class="exp-skill-header"><div class="exp-skill-icon esi-blue">🗂️</div><div><div class="exp-skill-name">Identity Governance</div><div class="exp-skill-sub">SailPoint · Saviynt · Access Reviews</div></div></div>
+        <div class="exp-skill-desc">Delivered IGA programs end-to-end across SailPoint IIQ and Saviynt - from birthright role design to access certification campaigns and SoD analysis. Brought 40,000+ cloud identities under a single governance model and kept compliance teams happy across SOX, GDPR, and internal audit cycles.</div>
+        <div class="exp-skill-highlights">
+          <div class="exp-highlight">Birthright access for 30,000+ users - auto-assigned from HR data</div>
+          <div class="exp-highlight">200+ toxic SoD combinations found and cleaned up at Citi</div>
+          <div class="exp-highlight">3 audit cycles at Home Depot - zero escalations</div>
+          <div class="exp-highlight">SailPoint connected to AD, AWS IAM, Salesforce, ServiceNow</div>
+        </div>
+        <div class="exp-where"><span class="exp-where-tag">Citi Group</span><span class="exp-where-tag">Home Depot</span></div>
+      </div>
+      <div class="exp-skill-card reveal reveal-delay-2">
+        <div class="exp-skill-header"><div class="exp-skill-icon esi-green">🔑</div><div><div class="exp-skill-name">SSO &amp; Authentication</div><div class="exp-skill-sub">Okta · Entra ID · SAML · OAuth</div></div></div>
+        <div class="exp-skill-desc">Built and maintained SSO for 80+ enterprise and SaaS applications using SAML, OIDC and OAuth 2.0. Set up Conditional Access policies for 80,000+ users with device trust, location and risk signals. Handled OAuth and OIDC integrations that standardized how internal and third-party apps authenticate.</div>
+        <div class="exp-skill-highlights">
+          <div class="exp-highlight">Okta Conditional Access for 80,000+ users at Home Depot</div>
+          <div class="exp-highlight">SSO for 30+ apps - login failures down 40%</div>
+          <div class="exp-highlight">SCIM provisioning to 25+ SaaS apps - joiners/leavers automated</div>
+          <div class="exp-highlight">SAML 2.0 + OIDC federation for 40+ apps at CTE Global</div>
+        </div>
+        <div class="exp-where"><span class="exp-where-tag">Home Depot</span><span class="exp-where-tag">CTE Global</span></div>
+      </div>
+      <div class="exp-skill-card reveal reveal-delay-3">
+        <div class="exp-skill-header"><div class="exp-skill-icon esi-gold">🛡️</div><div><div class="exp-skill-name">RBAC &amp; Entitlement Management</div><div class="exp-skill-sub">Role Design · SoD · Access Reviews</div></div></div>
+        <div class="exp-skill-desc">Designed and cleaned up role structures across multiple organisations - mapping job functions to entitlement groups, eliminating over-provisioned access, and building preventive SoD controls. Kept role definitions current and documented for audit teams across regular review cycles.</div>
+        <div class="exp-skill-highlights">
+          <div class="exp-highlight">RBAC in Entra ID - enterprise roles mapped to directory groups</div>
+          <div class="exp-highlight">Provisioning exceptions reduced by ~35% at Citi</div>
+          <div class="exp-highlight">JIT tiers built to replace persistent elevated access</div>
+          <div class="exp-highlight">Role definitions and decision records maintained for audits</div>
+        </div>
+        <div class="exp-where"><span class="exp-where-tag">Honda</span><span class="exp-where-tag">Citi Group</span><span class="exp-where-tag">CTE Global</span></div>
+      </div>
+      <div class="exp-skill-card reveal">
+        <div class="exp-skill-header"><div class="exp-skill-icon esi-blue">⚙️</div><div><div class="exp-skill-name">Automation &amp; Integrations</div><div class="exp-skill-sub">Python · PowerShell · REST APIs</div></div></div>
+        <div class="exp-skill-desc">Wrote scripts and built integrations that replaced manual identity processes - bulk account onboarding, HR-triggered provisioning, automated deprovisioning, and Okta Workflows for lifecycle tasks. Connected IAM platforms to AD, AWS, Salesforce, ServiceNow and more.</div>
+        <div class="exp-skill-highlights">
+          <div class="exp-highlight">PowerShell + REST API bulk onboarding across 200+ servers</div>
+          <div class="exp-highlight">Python automation - 10,000+ identity events/month at Citi</div>
+          <div class="exp-highlight">CyberArk to SailPoint integration - provisioning driven by IGA</div>
+          <div class="exp-highlight">Okta Workflows - deactivation, group assignment, approvals automated</div>
+        </div>
+        <div class="exp-where"><span class="exp-where-tag">Honda</span><span class="exp-where-tag">Citi Group</span><span class="exp-where-tag">CTE Global</span></div>
+      </div>
+      <div class="exp-skill-card reveal reveal-delay-1">
+        <div class="exp-skill-header"><div class="exp-skill-icon esi-green">📋</div><div><div class="exp-skill-name">Compliance &amp; Audit</div><div class="exp-skill-sub">SOX · GDPR · Zero Findings</div></div></div>
+        <div class="exp-skill-desc">Kept IAM environments audit-ready across SOX, GDPR and internal frameworks - session recording, access certification, SoD controls and regular reporting for compliance teams. Zero critical audit findings across every engagement.</div>
+        <div class="exp-skill-highlights">
+          <div class="exp-highlight">SOX session recording and audit trails at Honda</div>
+          <div class="exp-highlight">Zero findings across 2 external audits at CTE Global</div>
+          <div class="exp-highlight">5 regulatory frameworks covered via SailPoint at Citi</div>
+          <div class="exp-highlight">SLA adherence improved 45% on auth issues at Home Depot</div>
+        </div>
+        <div class="exp-where"><span class="exp-where-tag">Honda</span><span class="exp-where-tag">Citi Group</span><span class="exp-where-tag">Home Depot</span><span class="exp-where-tag">CTE Global</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="container">
+    <div class="section-label reveal">Contact</div>
+    <h2 class="section-title reveal">Let's connect</h2>
+    <div class="contact-card reveal">
+      <div class="contact-heading">Get in touch</div>
+      <div class="contact-sub">Open to conversations about IAM implementations, AI engineering and consulting work.</div>
+      <div class="contact-row"><div class="contact-icon">✉</div><div><div class="contact-lbl">Email</div><div class="contact-val">[ your@email.com ]</div></div></div>
+      <div class="contact-row"><div class="contact-icon">in</div><div><div class="contact-lbl">LinkedIn</div><div class="contact-val">[ linkedin.com/in/yourprofile ]</div></div></div>
+      <div class="contact-row"><div class="contact-icon">⊛</div><div><div class="contact-lbl">Location</div><div class="contact-val">[ Your City, Country ]</div></div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-copy">© 2026 · Sushma · Built with intention</div>
+      <div class="footer-links"><a href="#">LinkedIn</a><a href="#">GitHub</a><a href="#">Resume</a></div>
+    </div>
+  </div>
+</footer>
+</div>
+
+<script>
+const canvas=document.getElementById('bg-canvas');
+const ctx=canvas.getContext('2d');
+let W,H,particles=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
+resize();window.addEventListener('resize',resize);
+class Particle{constructor(){this.reset()}reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.r=Math.random()*1.2+.3;this.vx=(Math.random()-.5)*.18;this.vy=(Math.random()-.5)*.18;this.alpha=Math.random()*.35+.05}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset()}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle=`rgba(200,185,154,${this.alpha})`;ctx.fill()}}
+for(let i=0;i<80;i++)particles.push(new Particle());
+function loop(){ctx.clearRect(0,0,W,H);particles.forEach(p=>{p.update();p.draw()});for(let i=0;i<particles.length;i++){for(let j=i+1;j<particles.length;j++){const dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<110){ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle=`rgba(200,185,154,${.04*(1-d/110)})`;ctx.lineWidth=.5;ctx.stroke()}}}requestAnimationFrame(loop)}
+loop();
+const card=document.getElementById('the-card'),wrap=document.getElementById('tilt-card');
+wrap.addEventListener('mousemove',e=>{const r=wrap.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;card.style.transform=`rotateY(${x*16}deg) rotateX(${-y*12}deg) translateZ(8px)`});
+wrap.addEventListener('mouseleave',()=>{card.style.transform='rotateY(0deg) rotateX(0deg) translateZ(0px)'});
+document.querySelectorAll('.project-card').forEach(c=>{c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect();c.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');c.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%')})});
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}})},{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
